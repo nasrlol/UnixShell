@@ -17,13 +17,12 @@ int main() {
         char *TEMP = "";
 
         scanf("%s", &TEMP);
-        for (int i = 0; i != "/0"; i++)
+        for (int i = 0; (TEMP + i) != "/0"; i++)
         {
                 tolower(TEMP[0]);
         }
 
         if (TEMP == "exit") {
-            RUNNING = false;
             printf("exited successfully");
         }
         else {
