@@ -11,7 +11,6 @@ int main() {
     char *COMMAND_HISTORY;
     COMMAND_HISTORY = (char *)malloc(sizeof(char));
 
-
     // RUNNING THE PROGRAM ON AN ENDLESS LOOP
     // BREAKS WHEN USER ENTERS EXIT
     while(RUNNING) {
