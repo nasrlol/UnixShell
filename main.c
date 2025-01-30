@@ -3,7 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
-#include <readline/history.h>
 #include <readline/readline.h>
 
 int main() {
