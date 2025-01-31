@@ -1,28 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-
 #include <string.h>
-#include <ctype.h>
-
 #include <readline/readline.h>
-
-// import files for reading the current directory
-#include "apue.c"
 #include <dirent.h>
+#include <unistd.h>
 
 #define true 1
 #define false 0
 
-void err_quit(char * str) {
-    printf("%s", str);
-}
-void err_sys(char * str) {
-    printf("%s", str);
-}
-
-void PROCESS_PID(char *string) {
-
+void PROCESS_PID()
+{
     printf("PID %ld\n", (long)getpid());
 }
 
@@ -39,13 +26,27 @@ void LIST_CURRENT_DIRECTORY(int argc, char *argv[])
     closedir(dp);
 }
 
+void ECHO_INPUT(char *string)
+{
+    printf("%s", string);
+}
+
+int loop_shell()
+{
+
+    
+    return 0;
+}
 
 int main(int argc, char *argv[]) {
 
-    printf("succefully started the program");
-    // RUNNING THE PROGRAM ON AN ENDLESS LOOP
-    // BREAKS WHEN USER ENTERS EXIT
-    // ReSharper disable once CppDFAEndlessLoop
+    int c; 
+    while ((c = getc(stdin) != EOF))
+    {
+        if put
+    }
+    LIST_CURRENT_DIRECTORY(argc, argv);
+    printf("successfully started the program");
 
     return 0;
 }
