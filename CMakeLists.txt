@@ -3,4 +3,5 @@ project(UnixShell C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(UnixShell main.c)
+add_executable(UnixShell main.c
+        apue.c)

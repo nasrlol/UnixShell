@@ -1,34 +1,51 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+
 #include <string.h>
 #include <ctype.h>
-#include <stdbool.h>
+
 #include <readline/readline.h>
 
-int main() {
-    const bool RUNNING = true;
-    char *COMMAND_HISTORY;
-    COMMAND_HISTORY = (char *)malloc(sizeof(char));
+// import files for reading the current directory
+#include "apue.c"
+#include <dirent.h>
 
+#define true 1
+#define false 0
+
+void err_quit(char * str) {
+    printf("%s", str);
+}
+void err_sys(char * str) {
+    printf("%s", str);
+}
+
+void PROCESS_PID(char *string) {
+
+    printf("PID %ld\n", (long)getpid());
+}
+
+void LIST_CURRENT_DIRECTORY(int argc, char *argv[])
+{
+    DIR *dp;
+    struct dirent *dirp;
+    if (argc != 2)
+        err_quit("usage: ls directory_name");
+    if ((dp = opendir(argv[1])) == NULL)
+        err_sys(  argv[1]);
+    while ((dirp = readdir(dp)) != NULL)
+        printf("%s\n", dirp->d_name);
+    closedir(dp);
+}
+
+
+int main(int argc, char *argv[]) {
+
+    printf("succefully started the program");
     // RUNNING THE PROGRAM ON AN ENDLESS LOOP
     // BREAKS WHEN USER ENTERS EXIT
-    while(RUNNING) {
-        char *TEMP = "";
+    // ReSharper disable once CppDFAEndlessLoop
 
-        scanf("%s", &TEMP);
-        for (int i = 0; (TEMP + i) != "/0"; i++)
-        {
-                tolower(TEMP[0]);
-        }
-
-        if (TEMP == "exit") {
-            printf("exited successfully");
-        }
-        else {
-            strcpy(&TEMP, (COMMAND_HISTORY));
-            printf("%s",COMMAND_HISTORY);
-        }
-
-    }
     return 0;
 }
