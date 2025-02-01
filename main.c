@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <readline/readline.h>
 #include <dirent.h>
@@ -9,20 +9,10 @@
 #define true 1
 #define false 0
 
-/* SIGNALS */
-#define SIGHUP  1   /* Hang up the process */ 
-#define SIGINT  2   /* Interrupt the process */ 
-#define SIGQUIT 3   /* Quit the process */ 
-#define SIGILL  4   /* Illegal instruction. */ 
-#define SIGTRAP 5   /* Trace trap. */ 
-#define SIGABRT 6   /* Abort. */
-
 typedef struct 
 {
     int process_id;
 } id;
-
-
 
 void process_execution(int id)
 {
@@ -44,28 +34,37 @@ void err_sys(char *string)
 
 void PROCESS_PID()
 {
+
     printf("PID %ld\n", (long)getpid());
 }
 
-void LIST_CURRENT_DIRECTORY(int argc, char *argv[])
+void list_directories()
 {
-    
+
 }
 
-void ECHO_INPUT(char *string)
+char *save_variable(char* command, char *argv)
 {
-    printf("%s", string);
+    char *variable = (char *)malloc(sizeof(char));
+
+    if (strcmp(argv[0], "$") == 0)
+    {
+        while(*argv != ("/0"))
+        {
+                        
+        }
+    }
 }
 
-int loop_shell()
+void ECHO_INPUT(char *command, char *argv)
 {
-
-    
-    return 0;
+    if (strcmp(command, "echo") == 0)
+    {
+        printf("argv");
+    }
 }
 
 int main(int argc, char *argv[]) {
-
 
     int i = getpid();
     printf("%d", i);
