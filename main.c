@@ -11,11 +11,7 @@
 /* BOOLEANS */
 #define true 1
 #define false 0
-
-typedef struct 
-{
-    int process_id;
-} id;
+#define _DEFAULT_SOURCE
 
 void exit_program(char *argv)
 {
@@ -32,24 +28,26 @@ void get_pid_parent_process()
 
 void list_directories()
 {
+    struct dirent **namelist;
+    int n;
 
-
-}
-
-
-char *save_variable(char* command, char *argv)
-{
-    char *variable = (char *)malloc(sizeof(char));
-    char *input = readline();
-
-    if (strcmp(argv[0], "$") == 0)
+    n = scandir(".", &namelist, NULL, alphasort);
+    if (n == -1)
     {
-        while(*argv != ("/0"))
-        {
-                        
-        }
+        perror("scandir");
+        exit(EXIT_FAILURE);
     }
+
+    while (n--)
+    {
+        printf("%s\n", namelist[n]->d_name);
+        free(namelist[n]);
+    }
+    free(namelist[n]);
+    exit(EXIT_SUCCESS);
 }
+
+
 
 void echo(char *command, char *argv)
 {
@@ -59,9 +57,17 @@ void echo(char *command, char *argv)
     }
 }
 
-int main(int argc, char *argv[]) 
+int main(void) 
 {
 
+    char *input;
+    readline(input);
+     
+    while(strcmp(input, "exit") != 0)
+    {
+        list_directories();
+    }
+        exit_program(input);
     
     return 0;
 }
