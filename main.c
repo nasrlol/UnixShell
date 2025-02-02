@@ -4,6 +4,9 @@
 #include <readline/readline.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
 
 /* BOOLEANS */
 #define true 1
@@ -14,38 +17,30 @@ typedef struct
     int process_id;
 } id;
 
-void process_execution(int id)
+void exit_program(char *argv)
 {
-    fork();
-}
-void REDIRECTION();
-void SCRIPTING();
-
-void ERROR_QUIT(char *CURRENT_COMMAND)
-{
-    printf("failed %s", CURRENT_COMMAND);
-    
+    if (strcmp(argv, "exit"))
+    {
+        exit(0);
+    }
 }
 
-void err_sys(char *string)
+void get_pid_parent_process()
 {
-    printf("%s", string);
-}
-
-void PROCESS_PID()
-{
-
     printf("PID %ld\n", (long)getpid());
 }
 
 void list_directories()
 {
 
+
 }
+
 
 char *save_variable(char* command, char *argv)
 {
     char *variable = (char *)malloc(sizeof(char));
+    char *input = readline();
 
     if (strcmp(argv[0], "$") == 0)
     {
@@ -56,7 +51,7 @@ char *save_variable(char* command, char *argv)
     }
 }
 
-void ECHO_INPUT(char *command, char *argv)
+void echo(char *command, char *argv)
 {
     if (strcmp(command, "echo") == 0)
     {
@@ -64,10 +59,9 @@ void ECHO_INPUT(char *command, char *argv)
     }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) 
+{
 
-    int i = getpid();
-    printf("%d", i);
-
+    
     return 0;
 }
