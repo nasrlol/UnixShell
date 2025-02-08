@@ -21,12 +21,9 @@ static char *COMMAND_HISTORY[MAX_HISTORY] = { NULL};
 
 // DEFAULT SHELL COMMANDS
 // exit() command
-void exit_program(char *argv)
+void exit_program()
 {
-    if (strcmp(argv, "exit"))
-    {
         exit(0);
-    }
 }
 
 // pwd command
@@ -97,7 +94,12 @@ int main(void)
     char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);    
     while (true)
     {
+        printf("SHELL> ");
         scanf("%s", input);
+
+        if (strcmp(input, "exit") == 0)
+            exit_program();
+
     }
 
     return 0;
