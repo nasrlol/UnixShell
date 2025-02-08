@@ -1,26 +1,22 @@
+#define _GNU_SOURCE
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 
-/* BOOLEANS */
-#define true 1
-#define false 0
-#define _DEFAULT_SOURCE
 
-#define MAX_HISTORY 10
+#define MAX_HISTORY 100
 #define MAX_COMMAND_LENGTH 256
 
-
-static int CURRENT_COMMAND_INDEX            = 0;
-static int CURRENT_COMMAND_HISTORY_INDEX    = 0;
-static char COMMAND_HISTORY[MAX_HISTORY][MAX_COMMAND_LENGTH];
-
-
-
-static char *line_read = (char*)NULL; 
+static int CURRENT_COMMAND_INDEX = 0;
+static int CURRENT_HISTORY_INDEX = 0;
+static char *COMMAND_HISTORY[MAX_HISTORY] = { NULL};
 
 
 // DEFAULT SHELL COMMANDS
@@ -38,7 +34,6 @@ void list_directories()
 {
     struct dirent **namelist;
     int n;
-
     n = scandir(".", &namelist, NULL, alphasort);
     if (n == -1)
     {
@@ -64,23 +59,25 @@ void echo(char *command, char *argv)
     }
 }
 
-char *save_history(char *user_input)
+char **save_history(char *user_input)
 {
-    
-    while (CURRENT_COMMAND_HISTORY_INDEX < MAX_HISTORY)
+    char **command_history;
+
+    for (CURRENT_HISTORY_INDEX; CURRENT_HISTORY_INDEX < MAX_HISTORY; CURRENT_HISTORY_INDEX++)
     {
-        while (CURRENT_COMMAND_INDEX < MAX_COMMAND_LENGTH)
-        {
-            COMMAND_HISTORY[CURRENT_COMMAND_HISTORY_INDEX][CURRENT_COMMAND_INDEX] = *user_input;
-            CURRENT_COMMAND_HISTORY_INDEX++;
-        }
+        for(CURRENT_COMMAND_INDEX; CURRENT_COMMAND_INDEX < MAX_COMMAND_LENGTH; CURRENT_COMMAND_INDEX++)
+            {
+                command_history[CURRENT_HISTORY_INDEX][CURRENT_COMMAND_INDEX] = user_input[CURRENT_COMMAND_INDEX];  
+            }
     }
-    return *COMMAND_HISTORY;
+    return command_history;
 }
 
 // GET USER INPUT
 char * get_line()
 {
+    char *line_read = malloc(sizeof(char) * MAX_COMMAND_LENGTH);
+
     if (line_read)
     {
         free(line_read);
@@ -97,12 +94,11 @@ char * get_line()
 
 int main(void) 
 {
-    char *input;    
-    while(strcmp(input, "exit") != 0)
+    char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);    
+    while (true)
     {
-        list_directories();
+        scanf("%s", input);
     }
-        exit_program(input);
-    
+
     return 0;
 }
