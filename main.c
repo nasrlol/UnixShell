@@ -1,5 +1,3 @@
-#define _GNU_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,38 +15,50 @@
 // static int CURRENT_HISTORY_INDEX = 0;
 // static char *COMMAND_HISTORY[MAX_HISTORY] = { NULL};
 
+struct com_struct
+{
+    char *com;
+    char *arg;
+};
 
-void test_print()
+void test()
 {
     printf("print to output");
 }
 
-// DEFAULT SHELL COMMANDS
 // exit() command
-void exit_program()
+void exit_()
 {
         exit(0);
 }
 
 // ls command
-void list_current_directories()
+// get the requested path and put it into a const later on when getting the user input 
+void ls(const char *path)
 {
     fork();
 
-    DIR *DIRECTORY_STREAM;
-    DIRECTORY_STREAM = opendir(".");
+    struct dirent *entry;
+    DIR *dP = opendir(path);
 
-    if (DIRECTORY_STREAM == NULL)
+    // check if the directory got opened succefully 
+    if (dP == NULL)
     {
-        perror("ERROR_DIRECTORY_STREAM_EMPTY");
+        perror("opendir");
+        return;
     }
-    else
-        printf("%p", (&DIRECTORY_STREAM));
-    _exit(0); 
+
+    // print the folder|directory name
+    while((entry = readdir(dP)) != NULL)
+    {
+        printf("s\n", entry->d_name);
+    }
+    closedir(dP);
 
 }
 
-char *print_working_directory()
+// pwd command
+char *pwd()
 {
     char *current_working_directory = malloc(sizeof(char) * 100);
     
@@ -63,7 +73,7 @@ char *print_working_directory()
     }
 }
 
-// echo emulation command, without variables
+// echo command
 char *echo(char *command)
 {
     char *argv = (char *)malloc(sizeof(char) * 4);
@@ -102,27 +112,53 @@ char *echo(char *command)
 
 }
 
-
-// GET USER INPUT
-char * get_line()
+struct com_struct split_command(char *input)
 {
-    char *line_read = malloc(sizeof(char) * MAX_COMMAND_LENGTH);
 
-    if (line_read)
+
+    // command bestaat uit 2 delen
+    // het commando zelf
+    // en argumenten voor het commado
+    // we moeten het commando opsplitsen in 2 delen
+    // we moeten een struct gebruiken
+
+    struct com_struct NEW_COMMAND;
+
+    char *command = (char *)malloc(sizeof(char) * 4);
+    char *argument = (char *)malloc(sizeof(char) * 100); 
+
+    if (command == NULL || argument == NULL)
     {
-        free(line_read);
-        line_read = (char *)NULL;
+        printf("found a null pointer when dynamically assigning memory to the command or variable argument");
+        exit(1);
     }
-    scanf("%s", &(*line_read));
 
-//    if (line_read && *line_read)
-//      save_history(line_read);
+    int space_position = 0;
+    for (int i = 0; i < sizeof(command); i++)
+    {
+        if (strcmp(&input[i], " ") == 0)
+        {
+            space_position = i;
 
-    return line_read;
+            for ( int j = 0; j < space_position; j++)
+            {
+                command = &input[j];
+            }
+            for (int x = space_position; x < sizeof(input) - space_position; x++)
+            {
+                argument = &input[x];
+            }
+        }
+        
+    }
+    NEW_COMMAND.com = command;
+    NEW_COMMAND.arg = argument;
+
+    return NEW_COMMAND;
+
 }
 
-
-int main(void) 
+int main(int argc, char *argv[]) 
 {
     char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);    
     while (true)
@@ -130,15 +166,14 @@ int main(void)
         printf("\nSHELL> ");
         scanf("%s", input);
 
-        if (strcmp(input, "exit") == 0)
-            exit_program();
-        else if(strcmp(input, "current_directory") == 0)
-            print_working_directory();
-        else if(strcmp(input, "test") == 0)
-            test_print();
-        else if(strcmp(input,"ls") == 0)
-            list_current_directories();
-    }
+        // input converted to struct with members: command and argument 
+        struct com_struct new_input = split_command(input); 
 
+        if (strcmp(new_input.com, "ls"))
+        { 
+            // failed logic, argv is for when executing the program, not for calling functions
+        }   
+    } 
+    
     return 0;
 }
