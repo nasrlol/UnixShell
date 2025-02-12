@@ -1,19 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
-#include <stdbool.h>
-#include <linux/limits.h>
 
 #define MAX_HISTORY 100
 #define MAX_COMMAND_LENGTH 256
-
-// static int CURRENT_COMMAND_INDEX = 0;
-// static int CURRENT_HISTORY_INDEX = 0;
-// static char *COMMAND_HISTORY[MAX_HISTORY] = { NULL};
 
 struct com_struct {
     char *com;
@@ -21,7 +13,7 @@ struct com_struct {
 };
 
 void test() {
-    printf("print to output");
+    printf("\nprint to output");
 }
 
 // exit() command
@@ -43,26 +35,14 @@ void ls(const char *path) {
 
     // print the folder|directory name
     while ((entry = readdir(dP)) != NULL) {
-        printf("s\n", entry->d_name);
+        printf("%s", entry->d_name);
     }
     closedir(dP);
 }
 
-// pwd command
-char *pwd() {
-    char *current_working_directory = malloc(sizeof(char) * 100);
-
-    if (getcwd(current_working_directory, sizeof(current_working_directory) != 0)) {
-        return current_working_directory;
-    } else {
-        perror("getcwd() error");
-        return "ERROR";
-    }
-}
-
 // echo command
-char *echo(char *command) {
-    char *argv = (char *) malloc(sizeof(char) * 4);
+char *echo(const char *command) {
+    const char *argv = (char *) malloc(sizeof(char) * 4);
     char *command_argument = (char *) malloc(sizeof(char) * 100);
 
     int separation_index = 0;
@@ -76,7 +56,6 @@ char *echo(char *command) {
         }
     }
     if (strcmp(argv, "echo") == 0) {
-
         for (int i = separation_index + 1; i < (sizeof(command) - separation_index); i++) {
             if (strcmp(&command[i], "\0") != 0) {
                 break;
@@ -89,60 +68,38 @@ char *echo(char *command) {
 }
 
 struct com_struct split_command(char *input) {
-
     struct com_struct NEW_COMMAND;
 
-    char *command = (char *) malloc(sizeof(char) * 4);
-    char *argument = (char *) malloc(sizeof(char) * 100);
+    const char *command = strtok(input, "");
+    const char *argument = strtok(NULL, "\n");
 
-    if (command == NULL || argument == NULL) {
-        printf("found a null pointer when dynamically assigning memory to the command or variable argument");
-        exit(1);
-    }
-
-    int space_position = 0;
-    for (int i = 0; i < sizeof(command); i++) {
-        if (strcmp(&input[i], " ") == 0) {
-            space_position = i;
-
-            for (int j = 0; j < space_position; j++) {
-                command = &input[j];
-            }
-            for (int x = space_position; x < sizeof(input) - space_position; x++) {
-                argument = &input[x];
-            }
-        }
-
-    }
-    NEW_COMMAND.com = command;
-    NEW_COMMAND.arg = argument;
+    NEW_COMMAND.com = command ? strdup(command) : NULL;
+    NEW_COMMAND.arg = command ? strdup(argument) : NULL;
 
     return NEW_COMMAND;
-
 }
 
 int main(void) {
-    char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);
+    while (1) {
+        char *input = malloc(MAX_COMMAND_LENGTH);
 
-    do {
-        if (getchar()) {
-            printf("\nSHELL> ");
-            scanf("%s", input);
+        // print the shell sign
+        printf("\n $ ");
 
-        struct com_struct new_input = split_command(input);
+        // get the user input, store it and split it up
+        fgets(input, MAX_COMMAND_LENGTH, stdin);
+        const struct com_struct new_input = split_command(input);
 
         if (strcmp(new_input.com, "ls") == 0) {
-            char *path;
-            path = (char *) malloc(sizeof(char) * 100);
-
-            strcpy(path, new_input.arg);
-            ls(path);
-        } else if (strcmp(new_input.com, "test") == 0){
+            ls(new_input.arg);
+        } else if (strcmp(new_input.com, "test") == 0) {
             test();
-        }
+        } else if (strcmp(new_input.com, "exit") == 0) {
+            free(input);
+            free(new_input.com);
+            free(new_input.arg);
+            exit_();
         }
     }
-    while (true);
-
     return 0;
 }
