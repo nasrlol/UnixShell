@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #define MAX_HISTORY 100
-#define MAX_COMMAND_LENGTH 256
+#define MAX_COMMAND_LENGTH 255
 
 struct com_struct {
     char *com;
@@ -40,66 +40,46 @@ void ls(const char *path) {
     closedir(dP);
 }
 
-// echo command
-char *echo(const char *command) {
-    const char *argv = (char *) malloc(sizeof(char) * 4);
-    char *command_argument = (char *) malloc(sizeof(char) * 100);
-
-    int separation_index = 0;
-    for (int i = 0; i < sizeof(command); i++) {
-        if (strcmp(&command[i], " ") == 0) {
-            separation_index = i;
-
-            for (int j = 0; j < separation_index; j++) {
-                argv = &command[j];
-            }
-        }
-    }
-    if (strcmp(argv, "echo") == 0) {
-        for (int i = separation_index + 1; i < (sizeof(command) - separation_index); i++) {
-            if (strcmp(&command[i], "\0") != 0) {
-                break;
-            } else {
-                strcpy(&command_argument[i - (separation_index - 1)], &command[i]);
-            }
-        }
-    }
-    return command_argument;
-}
-
 struct com_struct split_command(char *input) {
     struct com_struct NEW_COMMAND;
 
-    const char *command = strtok(input, "");
-    const char *argument = strtok(NULL, "\n");
+    const char *command = strtok(input, " ");
+    const char *argument = strtok(NULL, " ");
 
-    NEW_COMMAND.com = command ? strdup(command) : NULL;
-    NEW_COMMAND.arg = command ? strdup(argument) : NULL;
+    NEW_COMMAND.com = strdup(command);
+    NEW_COMMAND.arg = strdup(argument);
 
     return NEW_COMMAND;
 }
 
 int main(void) {
     while (1) {
-        char *input = malloc(MAX_COMMAND_LENGTH);
+        char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);
 
-        // print the shell sign
-        printf("\n $ ");
+        printf("\n$ ");
 
-        // get the user input, store it and split it up
         fgets(input, MAX_COMMAND_LENGTH, stdin);
         const struct com_struct new_input = split_command(input);
 
-        if (strcmp(new_input.com, "ls") == 0) {
-            ls(new_input.arg);
-        } else if (strcmp(new_input.com, "test") == 0) {
-            test();
-        } else if (strcmp(new_input.com, "exit") == 0) {
+        new_input.com[strcspn(new_input.com, "\n")] = '\0';
+        new_input.arg[strcspn(new_input.arg, "\n")] = '\0';
+
+        if (strcmp(new_input.com, "exit\n") == 0) {
+            exit_();
             free(input);
             free(new_input.com);
             free(new_input.arg);
-            exit_();
+            return 0;
+        }
+        if (strcmp(new_input.com, "ls\n") == 0) {
+            printf("DETECTED LS COMMAND");
+            ls(new_input.arg);
+        }
+        if (strcmp(new_input.com, "echo\n") == 0) {
+            printf("DETECTED ECHO COMMAND");
+            printf("%s", new_input.arg);
+            free(new_input.arg);
         }
     }
-    return 0;
 }
+
