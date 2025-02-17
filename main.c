@@ -22,7 +22,8 @@ void exit_() {
 }
 
 // ls command
-// get the requested path and put it into a const later on when getting the user input 
+// get the requested path and put it into a const later on when getting the user input
+
 void ls(const char *path) {
     struct dirent *entry;
     DIR *dP = opendir(path);
@@ -46,9 +47,21 @@ struct com_struct split_command(char *input) {
     const char *command = strtok(input, " ");
     const char *argument = strtok(NULL, " ");
 
-    NEW_COMMAND.com = strdup(command);
-    NEW_COMMAND.arg = strdup(argument);
 
+    if (command != NULL) {
+        NEW_COMMAND.com = strdup(command);
+    } else
+    {
+        printf("failed, null pointer detected");
+        free(command);
+    }
+
+    if (argument != NULL) {
+        NEW_COMMAND.arg = strdup(argument);
+    } else {
+        printf("failed, null pointer detected");
+        free(argument);
+    }
     return NEW_COMMAND;
 }
 
@@ -62,7 +75,7 @@ int main(void) {
         const struct com_struct new_input = split_command(input);
 
         new_input.com[strcspn(new_input.com, "\n")] = '\0';
-        new_input.arg[strcspn(new_input.arg, "\n")] = '\0';
+
 
         if (strcmp(new_input.com, "exit\n") == 0) {
             exit_();
@@ -73,6 +86,12 @@ int main(void) {
         }
         if (strcmp(new_input.com, "ls\n") == 0) {
             printf("DETECTED LS COMMAND");
+            if (new_input.arg == NULL) {
+                printf("\nARGUMENT NOT DEFINED");
+                free(new_input.com);
+                free(new_input.arg);
+                continue;
+            }
             ls(new_input.arg);
         }
         if (strcmp(new_input.com, "echo\n") == 0) {
@@ -82,4 +101,3 @@ int main(void) {
         }
     }
 }
-
