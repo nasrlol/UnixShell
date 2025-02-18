@@ -17,6 +17,39 @@ void test() {
     printf("\nprint to output");
 }
 
+void exec_command(char *input) {
+    struct command NEW_COMMAND = {};
+
+    // cycle through the command array and find the matching command and execute it
+}
+
+
+// shell commands functions prototypes
+void list(const char *path);
+
+void make_dir(const char *path);
+
+void remove_dir(const char *path);
+
+void remove_file(const char *path);
+
+void copy_files(const char *source, const char *dest);
+
+void move_files(const char *source, const char *dest);
+
+char *print_cdirectory();
+
+void change_directory(const char *path);
+
+void clear();
+
+
+struct exec_command CommandsList[] = {
+    {"ls", ls},
+};
+
+
+// shell command functions
 // ls command
 // get the requested path and put it into a const later on when getting the user input
 
