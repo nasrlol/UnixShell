@@ -39,7 +39,7 @@ void ls(const char *path) {
 }
 
 struct com_struct split_command(char *input) {
-    struct com_struct NEW_COMMAND;
+    struct com_struct NEW_COMMAND = {};
 
     char *command = strtok(input, " ");
     char *argument = strtok(NULL, " ");
@@ -48,48 +48,42 @@ struct com_struct split_command(char *input) {
     if (command != NULL) {
         NEW_COMMAND.com = strdup(command);
     } else {
-        printf("failed, null pointer detected");
+        printf("failed, null pointer detected, no initial command has been inserted");
         free(command);
     }
 
     if (argument != NULL) {
         NEW_COMMAND.arg = strdup(argument);
     } else {
-        printf("failed, null pointer detected");
+        printf("failed, null pointer detected, no argument has been added");
         free(argument);
     }
-    NEW_COMMAND.error = 1;
+
     return NEW_COMMAND;
 }
 
 int main(void) {
     while (1) {
-        char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);
-
         printf("\n$ ");
 
+        char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);
         fgets(input, MAX_COMMAND_LENGTH, stdin);
-        struct com_struct new_input = split_command(input);
+
+        const struct com_struct new_input = split_command(input);
 
         new_input.com[strcspn(new_input.com, "\n")] = '\0';
+        new_input.arg[strcspn(new_input.arg, "\n")] = '\0';
 
-
-        if (strcmp(new_input.com, "exit\n") == 0) {
-            if (input != NULL)
-                free(input);
-            if (new_input.com != NULL)
-                free(new_input.com);
-            if (new_input.arg != NULL)
-                free(new_input.arg);
+        if (strcmp(new_input.com, "exit") == 0) {
+            free(input);
             return 0;
         }
-        if (strcmp(new_input.com, "ls\n") == 0) {
+        if (strcmp(new_input.com, "ls") == 0) {
             ls(new_input.arg);
             free(new_input.com);
             free(new_input.arg);
         }
-        if (strcmp(new_input.com, "echo\n") == 0) {
-            printf("DETECTED ECHO COMMAND");
+        if (strcmp(new_input.com, "echo") == 0) {
             printf("%s", new_input.arg);
             free(new_input.arg);
         }
