@@ -81,6 +81,7 @@ void change_directory(const char *path) {
 }
 
 int main(void) {
+    clear();
     while (1) {
         printf("\n$ ");
 
