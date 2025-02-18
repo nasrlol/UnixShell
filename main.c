@@ -62,6 +62,20 @@ struct com_struct split_command(char *input) {
     return NEW_COMMAND;
 }
 
+void clear() {
+    // clear the visible part of the terminal -> see man pages clear command
+    printf("\033[2J");
+    // clear the input buffer of the terminal -> see man pages clear command
+    printf("\033[3J");
+}
+
+void change_directory(const char *path) {
+    if (path == NULL) {
+        printf("No path found\n");
+        return;
+    }
+}
+
 int main(void) {
     while (1) {
         printf("\n$ ");
