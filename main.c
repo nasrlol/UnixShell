@@ -103,7 +103,9 @@ int main(void) {
         if (strcmp(new_input.com, "ls") == 0) {
             ls(new_input.arg);
             free(new_input.com);
-            free(new_input.arg);
+            if (new_input.arg != NULL) {
+                free(new_input.arg);
+            }
         }
         if (strcmp(new_input.com, "echo") == 0) {
             printf("%s", new_input.arg);
