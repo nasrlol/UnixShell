@@ -106,6 +106,19 @@ void clear() {
     printf("\033[3J");
 }
 
+char *print_cdirectory() {
+    char *current_working_directory = getcwd(NULL, 0);
+    /* getcwd() command already allocates malloc for the path that should be returned,
+     to do: should I free it when finished or not?/
+      so what I understand from the documentation, you should only free it when actually setting an exact size
+      but when keeping the max size to 0 and relying on the malloc there is no need for it
+      not sure though
+      should rely on further debugging
+     */
+
+    return current_working_directory;
+}
+
 void change_directory(const char *path) {
     if (path == NULL) {
         printf("No path found\n");
