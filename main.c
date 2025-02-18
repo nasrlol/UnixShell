@@ -5,16 +5,45 @@
 #include <unistd.h>
 
 #define MAX_HISTORY 100
-#define MAX_COMMAND_LENGTH 255
+#define MAX_COMMAND_LENGTH 255 // not setting a  macro for the argument because they are included in the command)
+#define MAX_PATH_LENGTH 1024
 
-struct com_struct {
+struct command {
     char *com;
     char *arg;
-    int error; // 0: okay 1: not okay
 };
 
-void test() {
-    printf("\nprint to output");
+struct exec_command {
+    struct command *cmd;
+    void (*func);
+};
+
+
+// code prototype functions
+struct command split_command(char *input);
+
+void exec_command(char *input);
+
+// code functions
+struct command split_command(char *input) {
+    struct command NEW_COMMAND = {};
+
+    char *command = strtok(input, " ");
+    char *argument = strtok(NULL, " ");
+
+    if (command != NULL) {
+        NEW_COMMAND.com = strdup(command);
+    } else {
+        printf("failed, null pointer detected, no initial command has been inserted");
+        free(command);
+    }
+
+    if (argument != NULL) {
+        NEW_COMMAND.arg = strdup(argument);
+    } else {
+        free(argument);
+    }
+    return NEW_COMMAND;
 }
 
 void exec_command(char *input) {
@@ -51,8 +80,6 @@ struct exec_command CommandsList[] = {
 
 // shell command functions
 // ls command
-// get the requested path and put it into a const later on when getting the user input
-
 void ls(const char *path) {
     struct dirent *entry;
     if (path == NULL) {
@@ -69,34 +96,9 @@ void ls(const char *path) {
 
     // print the folder|directory name
     while ((entry = readdir(dP)) != NULL) {
-        char *temporary_variable = entry->d_name;
         printf("%s\n", entry->d_name);
     }
     closedir(dP);
-}
-
-struct com_struct split_command(char *input) {
-    struct com_struct NEW_COMMAND = {};
-
-    char *command = strtok(input, " ");
-    char *argument = strtok(NULL, " ");
-
-
-    if (command != NULL) {
-        NEW_COMMAND.com = strdup(command);
-    } else {
-        printf("failed, null pointer detected, no initial command has been inserted");
-        free(command);
-    }
-
-    if (argument != NULL) {
-        NEW_COMMAND.arg = strdup(argument);
-    } else {
-        printf("failed, null pointer detected, no argument has been added");
-        free(argument);
-    }
-
-    return NEW_COMMAND;
 }
 
 void clear() {
@@ -122,7 +124,6 @@ char *print_cdirectory() {
 void change_directory(const char *path) {
     if (path == NULL) {
         printf("No path found\n");
-        return;
     }
 }
 
@@ -134,8 +135,7 @@ int main(void) {
         char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);
         fgets(input, MAX_COMMAND_LENGTH, stdin);
 
-        const struct com_struct new_input = split_command(input);
-
+        const struct command new_input = split_command(input);
         new_input.com[strcspn(new_input.com, "\n")] = '\0';
 
         if (new_input.arg != NULL) {
