@@ -17,11 +17,6 @@ void test() {
     printf("\nprint to output");
 }
 
-// exit() command
-void exit_() {
-    exit(0);
-}
-
 // ls command
 // get the requested path and put it into a const later on when getting the user input
 
@@ -80,18 +75,18 @@ int main(void) {
 
 
         if (strcmp(new_input.com, "exit\n") == 0) {
-            exit_();
-            free(input);
-            free(new_input.com);
-            free(new_input.arg);
+            if (input != NULL)
+                free(input);
+            if (new_input.com != NULL)
+                free(new_input.com);
+            if (new_input.arg != NULL)
+                free(new_input.arg);
             return 0;
         }
         if (strcmp(new_input.com, "ls\n") == 0) {
-            printf("DETECTED LS COMMAND");
-            printf("\nARGUMENT NOT DEFINED");
+            ls(new_input.arg);
             free(new_input.com);
             free(new_input.arg);
-            ls(new_input.arg);
         }
         if (strcmp(new_input.com, "echo\n") == 0) {
             printf("DETECTED ECHO COMMAND");
