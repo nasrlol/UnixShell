@@ -22,6 +22,10 @@ void test() {
 
 void ls(const char *path) {
     struct dirent *entry;
+    if (path == NULL) {
+        printf("No path found\n");
+        return;
+    }
     DIR *dP = opendir(path);
 
     // check if the directory got opened successfully
