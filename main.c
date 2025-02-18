@@ -91,7 +91,10 @@ int main(void) {
         const struct com_struct new_input = split_command(input);
 
         new_input.com[strcspn(new_input.com, "\n")] = '\0';
-        new_input.arg[strcspn(new_input.arg, "\n")] = '\0';
+
+        if (new_input.arg != NULL) {
+            new_input.arg[strcspn(new_input.arg, "\n")] = '\0';
+        }
 
         if (strcmp(new_input.com, "exit") == 0) {
             free(input);
