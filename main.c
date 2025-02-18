@@ -111,5 +111,8 @@ int main(void) {
             printf("%s", new_input.arg);
             free(new_input.arg);
         }
+        if (strcmp(new_input.com, "clear") == 0) {
+            clear();
+        }
     }
 }
