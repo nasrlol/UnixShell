@@ -14,8 +14,8 @@ struct command {
 };
 
 struct exec_command {
-    struct command *cmd;
-    void (*func);
+    const char *cmd;
+    void (*func)(const char *);
 };
 
 
