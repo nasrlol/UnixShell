@@ -66,7 +66,7 @@ void copy_files(const char *arg);
 
 void move_files(const char *arg);
 
-char *print_cdirectory();
+void print_cdirectory(const char *arg);
 
 void change_directory(const char *path);
 
