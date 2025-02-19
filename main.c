@@ -74,7 +74,16 @@ void clear();
 
 
 struct exec_command CommandsList[] = {
-    {"ls", ls},
+    {"ls", list},
+    {"make_dir", make_dir},
+    {"remove_dir", remove_dir},
+    {"remove_file", remove_file},
+    {"copy_files", copy_files},
+    {"move_files", move_files},
+    {"print_cdirectory", print_cdirectory},
+    {"change_directory", change_directory},
+    {"clear", clear},
+    {"echo", echo}
 };
 
 // code functions
