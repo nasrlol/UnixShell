@@ -70,7 +70,7 @@ void print_cdirectory(const char *arg);
 
 void change_directory(const char *path);
 
-void clear();
+void clear(const char *arg);
 
 
 struct exec_command CommandsList[] = {
