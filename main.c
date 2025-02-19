@@ -206,7 +206,8 @@ void change_directory(const char *path) {
 }
 
 int main(void) {
-    clear();
+    clear(NULL);
+    // ReSharper disable once CppDFAEndlessLoop
     while (1) {
         printf("\n$ ");
 
