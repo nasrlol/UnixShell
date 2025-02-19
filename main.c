@@ -5,45 +5,31 @@
 #include <unistd.h>
 
 #define MAX_HISTORY 100
-#define MAX_COMMAND_LENGTH 255
+#define MAX_COMMAND_LENGTH 255 // not setting a  macro for the argument because they are included in the command)
+#define MAX_PATH_LENGTH 1024
 
-struct com_struct {
+struct command {
     char *com;
     char *arg;
-    int error; // 0: okay 1: not okay
 };
 
-void test() {
-    printf("\nprint to output");
-}
+struct exec_command {
+    struct command *cmd;
+    void (*func);
+};
 
-// ls command
-// get the requested path and put it into a const later on when getting the user input
 
-void ls(const char *path) {
-    struct dirent *entry;
-    DIR *dP = opendir(path);
+// code prototype functions
+struct command split_command(char *input);
 
-    // check if the directory got opened successfully
-    if (dP == NULL) {
-        perror("opendir");
-        return;
-    }
+void exec_command(char *input);
 
-    // print the folder|directory name
-    while ((entry = readdir(dP)) != NULL) {
-        char *temporary_variable = entry->d_name;
-        printf("%s\n", entry->d_name);
-    }
-    closedir(dP);
-}
-
-struct com_struct split_command(char *input) {
-    struct com_struct NEW_COMMAND = {};
+// code functions
+struct command split_command(char *input) {
+    struct command NEW_COMMAND = {};
 
     char *command = strtok(input, " ");
     char *argument = strtok(NULL, " ");
-
 
     if (command != NULL) {
         NEW_COMMAND.com = strdup(command);
@@ -55,24 +41,106 @@ struct com_struct split_command(char *input) {
     if (argument != NULL) {
         NEW_COMMAND.arg = strdup(argument);
     } else {
-        printf("failed, null pointer detected, no argument has been added");
         free(argument);
     }
-
     return NEW_COMMAND;
 }
 
+void exec_command(char *input) {
+    struct command NEW_COMMAND = {};
+
+    // cycle through the command array and find the matching command and execute it
+}
+
+
+// shell commands functions prototypes
+void list(const char *path);
+
+void make_dir(const char *path);
+
+void remove_dir(const char *path);
+
+void remove_file(const char *path);
+
+void copy_files(const char *source, const char *dest);
+
+void move_files(const char *source, const char *dest);
+
+char *print_cdirectory();
+
+void change_directory(const char *path);
+
+void clear();
+
+
+struct exec_command CommandsList[] = {
+    {"ls", ls},
+};
+
+
+// shell command functions
+// ls command
+void ls(const char *path) {
+    struct dirent *entry;
+    if (path == NULL) {
+        printf("No path found\n");
+        return;
+    }
+    DIR *dP = opendir(path);
+
+    // check if the directory got opened successfully
+    if (dP == NULL) {
+        perror("opendir");
+        return;
+    }
+
+    // print the folder|directory name
+    while ((entry = readdir(dP)) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+    closedir(dP);
+}
+
+void clear() {
+    // clear the visible part of the terminal -> see man pages clear command
+    printf("\033[2J");
+    // clear the input buffer of the terminal -> see man pages clear command
+    printf("\033[3J");
+}
+
+char *print_cdirectory() {
+    char *current_working_directory = getcwd(NULL, 0);
+    /* getcwd() command already allocates malloc for the path that should be returned,
+     to do: should I free it when finished or not?/
+      so what I understand from the documentation, you should only free it when actually setting an exact size
+      but when keeping the max size to 0 and relying on the malloc there is no need for it
+      not sure though
+      should rely on further debugging
+     */
+
+    return current_working_directory;
+}
+
+void change_directory(const char *path) {
+    if (path == NULL) {
+        printf("No path found\n");
+    }
+}
+
 int main(void) {
+    clear();
     while (1) {
         printf("\n$ ");
 
         char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);
         fgets(input, MAX_COMMAND_LENGTH, stdin);
 
-        const struct com_struct new_input = split_command(input);
-
+        const struct command new_input = split_command(input);
         new_input.com[strcspn(new_input.com, "\n")] = '\0';
-        new_input.arg[strcspn(new_input.arg, "\n")] = '\0';
+
+        if (new_input.arg != NULL) {
+            new_input.arg[strcspn(new_input.arg, "\n")] = '\0';
+        }
 
         if (strcmp(new_input.com, "exit") == 0) {
             free(input);
@@ -81,11 +149,16 @@ int main(void) {
         if (strcmp(new_input.com, "ls") == 0) {
             ls(new_input.arg);
             free(new_input.com);
-            free(new_input.arg);
+            if (new_input.arg != NULL) {
+                free(new_input.arg);
+            }
         }
         if (strcmp(new_input.com, "echo") == 0) {
             printf("%s", new_input.arg);
             free(new_input.arg);
+        }
+        if (strcmp(new_input.com, "clear") == 0) {
+            clear();
         }
     }
 }
