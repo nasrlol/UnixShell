@@ -1,3 +1,3 @@
-/home/nasr/unixshell/cmake-build-debug/CMakeFiles/program.dir
-/home/nasr/unixshell/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/nasr/unixshell/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/nsrddyn/Documents/UnixShell/cmake-build-debug/CMakeFiles/program.dir
+/Users/nsrddyn/Documents/UnixShell/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/nsrddyn/Documents/UnixShell/cmake-build-debug/CMakeFiles/rebuild_cache.dir
