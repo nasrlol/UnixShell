@@ -77,6 +77,42 @@ struct exec_command CommandsList[] = {
     {"ls", ls},
 };
 
+// code functions
+struct command split_command(char *input) {
+    struct command NEW_COMMAND = {};
+
+    char *command = strtok(input, " ");
+    char *argument = strtok(NULL, " ");
+
+    if (command != NULL) {
+        NEW_COMMAND.com = strdup(command);
+    } else {
+        printf("failed, null pointer detected, no initial command has been inserted");
+        free(command);
+    }
+
+    if (argument != NULL) {
+        NEW_COMMAND.arg = strdup(argument);
+    } else {
+        free(argument);
+    }
+    return NEW_COMMAND;
+}
+
+void exec_command(char *input) {
+    const struct command user_command = split_command(input);
+    user_command.com[strcspn(user_command.com, "\n")] = '\0';
+    if (user_command.arg != NULL) {
+        user_command.arg[strcspn(user_command.arg, "\n")] = '\0';
+    }
+
+    for (int i = 0; i < sizeof(*CommandsList) / sizeof(CommandsList->cmd[0]); i++) {
+        // ReSharper disable once CppIncompatiblePointerConversion
+        if (strcmp(user_command.com, &CommandsList->cmd[i]) == 0) {
+            CommandsList[i].func(user_command.arg);
+        }
+    }
+}
 
 // shell command functions
 // ls command
