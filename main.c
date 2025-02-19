@@ -146,7 +146,32 @@ void ls(const char *path) {
     closedir(dP);
 }
 
-void clear() {
+void make_dir(const char *path) {
+    printf("made a new directory");
+}
+
+void remove_dir(const char *path) {
+    printf("removed a directory");
+}
+
+void remove_file(const char *path) {
+    printf("remove_file");
+}
+
+void copy_files(const char *arg) {
+    printf("copy file");
+}
+
+void move_files(const char *arg) {
+    printf("move file");
+}
+
+void clear(const char *arg) {
+    if (arg != NULL) {
+        printf("clear doesn't support any arguments, see help() for help");
+        return;
+    }
+
     // clear the visible part of the terminal -> see man pages clear command
     printf("\033[2J");
     // clear the input buffer of the terminal -> see man pages clear command
