@@ -178,7 +178,15 @@ void clear(const char *arg) {
     printf("\033[3J");
 }
 
-char *print_cdirectory() {
+void echo(const char *arg) {
+    printf("%s", arg);
+}
+
+void print_cdirectory(const char *arg) {
+    if (arg != NULL) {
+        printf("print_cdirectory doesn't support any arguments, see help() for help");
+        return;
+    }
     char *current_working_directory = getcwd(NULL, 0);
     /* getcwd() command already allocates malloc for the path that should be returned,
      to do: should I free it when finished or not?/
