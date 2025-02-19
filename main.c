@@ -72,6 +72,7 @@ void change_directory(const char *path);
 
 void clear(const char *arg);
 
+void echo(const char *arg);
 
 struct exec_command CommandsList[] = {
     {"ls", list},
