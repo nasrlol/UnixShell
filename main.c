@@ -126,7 +126,7 @@ void exec_command(char *input) {
 
 // shell command functions
 // ls command
-void ls(const char *path) {
+void list(const char *path) {
     struct dirent *entry;
     if (path == NULL) {
         printf("No path found\n");
