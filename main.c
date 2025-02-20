@@ -21,44 +21,34 @@ struct exec_command {
 
 // code prototype functions
 struct command split_command(char *input);
-
 void exec_command(char *input);
 
 // shell commands functions prototypes
 void list(const char *path);
-
 void make_dir(const char *path);
-
 void remove_dir(const char *path);
-
 void remove_file(const char *path);
-
 void copy_files(const char *arg);
-
 void move_files(const char *arg);
-
 void print_cdirectory(const char *arg);
-
 void change_directory(const char *path);
-
 void clear(const char *arg);
-
 void echo(const char *arg);
 
 struct exec_command CommandsList[] = {
     {"ls", list},
-    {"make_dir", make_dir},
-    {"remove_dir", remove_dir},
-    {"remove_file", remove_file},
-    {"copy_files", copy_files},
-    {"move_files", move_files},
-    {"print_cdirectory", print_cdirectory},
-    {"change_directory", change_directory},
-    {"clear", clear},
+    {"mkdir", make_dir},
+    {"rmdir", remove_dir},
+    {"rm", remove_file},
+    {"cp", copy_files},
+    {"mv", move_files},
+    {"pwd", print_cdirectory},
+    {"cd", change_directory},
+    {"clr", clear},
     {"echo", echo}
 };
 
-// code functions
+// Code functions
 struct command split_command(char *input) {
     struct command NEW_COMMAND = {};
 
@@ -68,14 +58,16 @@ struct command split_command(char *input) {
     if (command != NULL) {
         NEW_COMMAND.com = strdup(command);
     } else {
-        printf("failed, null pointer detected, no initial command has been inserted");
+        perror("failed, null pointer detected, no initial command has been inserted: see command");
         free(command);
     }
 
     if (argument != NULL) {
         NEW_COMMAND.arg = strdup(argument);
     } else {
+        perror("failed, null pointer detected, no initial command has been inserted: see argument");
         free(argument);
+        NEW_COMMAND.arg = NULL;
     }
     return NEW_COMMAND;
 }
@@ -88,19 +80,19 @@ void exec_command(char *input) {
     }
 
     for (int i = 0; i < sizeof(*CommandsList) / sizeof(CommandsList->cmd[0]); i++) {
-        // ReSharper disable once CppIncompatiblePointerConversion
         if (strcmp(user_command.com, &CommandsList->cmd[i]) == 0) {
             CommandsList[i].func(user_command.arg);
         }
     }
+    free(user_command.com);
+    free(user_command.arg);
 }
 
-// shell command functions
 // ls command
 void list(const char *path) {
     struct dirent *entry;
     if (path == NULL) {
-        printf("No path found\n");
+        perror("No path found\n");
         return;
     }
     DIR *dP = opendir(path);
@@ -111,7 +103,7 @@ void list(const char *path) {
         return;
     }
 
-    // print the folder|directory name
+    // Print the folder|directory name
     while ((entry = readdir(dP)) != NULL) {
         printf("%s\n", entry->d_name);
     }
@@ -139,15 +131,9 @@ void move_files(const char *arg) {
 }
 
 void clear(const char *arg) {
-    if (arg != NULL) {
-        printf("clear doesn't support any arguments, see help() for help");
-        return;
-    }
-
-    // clear the visible part of the terminal -> see man pages clear command
     printf("\033[2J");
-    // clear the input buffer of the terminal -> see man pages clear command
     printf("\033[3J");
+    printf("\033[H");
 }
 
 void echo(const char *arg) {
@@ -155,10 +141,6 @@ void echo(const char *arg) {
 }
 
 void print_cdirectory(const char *arg) {
-    if (arg != NULL) {
-        printf("print_cdirectory doesn't support any arguments, see help() for help");
-        return;
-    }
     char *current_working_directory = getcwd(NULL, 0);
     printf("%s", current_working_directory);
 }
@@ -170,7 +152,7 @@ void change_directory(const char *path) {
 }
 
 int main(void) {
-    clear(NULL);
+    clear("");
     // ReSharper disable once CppDFAEndlessLoop
     while (1) {
         printf("\n$ ");
@@ -178,5 +160,6 @@ int main(void) {
         char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);
         fgets(input, MAX_COMMAND_LENGTH, stdin);
         exec_command(input);
+        free(input);
     }
 }
