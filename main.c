@@ -158,6 +158,25 @@ void change_ownership(const char *path) {
 void copy_files(const char *arg) {
     // split the argument into the source and destination
     // make a copy of the source file in the destination file
+    int c;
+
+    FILE *pold_file = fopen(argument.source, "r");
+    if (pold_file == NULL) {
+        perror("cant open the source file for reading (copy failed) ");
+        return;
+    }
+
+    FILE *pnew_file = fopen(argument.destination, "w");
+    if (pnew_file == NULL) {
+        perror("cant open the destination file for reading (copy failed)");
+        return;
+    }
+
+    while ((c = fgetc(pold_file)) != EOF) {
+        fputc(c, pnew_file);
+    }
+    fclose(pnew_file);
+    fclose(pold_file);
 }
 
 void move_files(const char *arg) {
