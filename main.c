@@ -179,8 +179,15 @@ void copy_files(const char *arg) {
     fclose(pold_file);
 }
 
-void move_files(const char *arg) {
-    printf("move file");
+void move_files(const struct split_arg argument) {
+    if (remove(argument.source) != 0) {
+        perror("failed while trying to move the file");
+    }
+    // Create a file
+    FILE *pFile = fopen(argument.destination, "w");
+
+    // Close the file
+    fclose(pFile);
 }
 
 void clear(const char *arg) {
