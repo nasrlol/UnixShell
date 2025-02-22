@@ -3,6 +3,8 @@
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define MAX_HISTORY 100
 #define MAX_COMMAND_LENGTH 255 // not setting a  macro for the argument because they are included in the command
@@ -26,61 +28,56 @@ void exec_command(char *input);
 // shell commands functions prototypes
 void list(const char *path);
 void make_dir(const char *path);
-void remove_dir(const char *path);
 void remove_file(const char *path);
 void copy_files(const char *arg);
 void move_files(const char *arg);
 void print_cdirectory(const char *arg);
 void change_directory(const char *path);
+void change_ownership(const char *path);
 void clear(const char *arg);
 void echo(const char *arg);
+void exit_(const char *arg);
 
 struct exec_command CommandsList[] = {
     {"ls", list},
     {"mkdir", make_dir},
-    {"rmdir", remove_dir},
     {"rm", remove_file},
     {"cp", copy_files},
     {"mv", move_files},
+    {"chown", change_ownership},
     {"pwd", print_cdirectory},
     {"cd", change_directory},
     {"clr", clear},
-    {"echo", echo}
+    {"echo", echo},
+    {"exit", exit_}
 };
 
 // Code functions
 struct command split_command(char *input) {
-    struct command NEW_COMMAND = {};
+    struct command user_command; 
 
     char *command = strtok(input, " ");
     char *argument = strtok(NULL, " ");
 
-    if (command != NULL) {
-        NEW_COMMAND.com = strdup(command);
-    } else {
-        perror("failed, null pointer detected, no initial command has been inserted: see command");
-        free(command);
-    }
+    user_command.com = strdup(command);
 
     if (argument != NULL) {
-        NEW_COMMAND.arg = strdup(argument);
+        user_command.arg = strdup(argument);
     } else {
-        perror("failed, null pointer detected, no initial command has been inserted: see argument");
-        free(argument);
-        NEW_COMMAND.arg = NULL;
+        user_command.arg = NULL;
     }
-    return NEW_COMMAND;
+    return user_command;
 }
 
 void exec_command(char *input) {
-    const struct command user_command = split_command(input);
-    user_command.com[strcspn(user_command.com, "\n")] = '\0';
-    if (user_command.arg != NULL) {
-        user_command.arg[strcspn(user_command.arg, "\n")] = '\0';
-    }
+    struct command user_command = split_command(input);
 
-    for (int i = 0; i < sizeof(*CommandsList) / sizeof(CommandsList->cmd[0]); i++) {
-        if (strcmp(user_command.com, &CommandsList->cmd[i]) == 0) {
+    user_command.com[strcspn(user_command.com, "\n")] = '\0';
+    if (user_command.arg != NULL)
+        user_command.arg[strcspn(user_command.arg, "\n")] = '\0';
+
+    for (int i = 0; i < sizeof(CommandsList) / sizeof(CommandsList[0]); i++) {
+        if (strcmp(user_command.com, CommandsList[i].cmd) == 0) {
             CommandsList[i].func(user_command.arg);
         }
     }
@@ -92,8 +89,7 @@ void exec_command(char *input) {
 void list(const char *path) {
     struct dirent *entry;
     if (path == NULL) {
-        perror("No path found\n");
-        return;
+        path = ".";
     }
     DIR *dP = opendir(path);
 
@@ -111,15 +107,25 @@ void list(const char *path) {
 }
 
 void make_dir(const char *path) {
-    printf("made a new directory");
+    if (mkdir(path, 0755) == 0)
+        perror("failed to make directory");
 }
 
-void remove_dir(const char *path) {
-    printf("removed a directory");
-}
 
 void remove_file(const char *path) {
-    printf("remove_file");
+    if (unlink(path) != 0) {
+        perror("failed to delete file");
+    }
+}
+
+void change_ownership(const char *path)
+{
+    if((chmod(path,S_IRWXU) != 0))
+    {
+        perror("failed to get ownership of the file");
+    } else {
+        printf("file permissions updated succssfully");
+    }
 }
 
 void copy_files(const char *arg) {
@@ -140,6 +146,9 @@ void echo(const char *arg) {
     printf("%s", arg);
 }
 
+void exit_(const char *arg){
+    exit(0);
+}
 void print_cdirectory(const char *arg) {
     char *current_working_directory = getcwd(NULL, 0);
     printf("%s", current_working_directory);
@@ -149,6 +158,8 @@ void change_directory(const char *path) {
     if (path == NULL) {
         printf("No path found\n");
     }
+    else if (chdir(path) != 0)
+        perror("path not found");
 }
 
 int main(void) {
@@ -157,7 +168,7 @@ int main(void) {
     while (1) {
         printf("\n$ ");
 
-        char *input = malloc(sizeof(char *) * MAX_COMMAND_LENGTH);
+        char *input = malloc(sizeof(char) * MAX_COMMAND_LENGTH);
         fgets(input, MAX_COMMAND_LENGTH, stdin);
         exec_command(input);
         free(input);
