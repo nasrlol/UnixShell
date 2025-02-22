@@ -149,9 +149,17 @@ void remove_dir(const char *path)
         struct dirent *entry;
         DIR *dP = opendir(path);
 
-        if (dP == NULL){
-            perror("failed to open the directory to delete the files recursivly");
+        if (dP == NULL) {
+            perror("failed to open the directory to delete the files recursively");
         }
+
+        // ReSharper disable once CppPointerConversionDropsQualifiers
+        while ((entry = readdir(dP)) != NULL) {
+            if (rmdir(entry->d_name) != 0) {
+                perror("failed to delete the directory 02");
+            }
+        }
+        printf("%p", dP);
     }
 }
 
