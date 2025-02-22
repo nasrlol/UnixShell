@@ -31,6 +31,8 @@ struct command split_command(char *input);
 
 void exec_command(char *input);
 
+void split_arg(struct command argument);
+
 // shell commands functions prototypes
 void list(const char *path);
 
@@ -38,11 +40,11 @@ void make_dir(const char *path);
 
 void remove_file(const char *path);
 
-void remove_dir(const char *path); // trying to delete the folder and the files init recursivly
+void remove_dir(const char *path); // trying to delete the folder and the files init recursively
 
-void copy_files(const char *arg);
+void copy_files(struct split_arg);
 
-void move_files(const char *arg);
+void move_files(struct split_arg);
 
 void print_cdirectory(const char *arg);
 
@@ -129,7 +131,7 @@ void list(const char *path) {
 
     // check if the directory got opened successfully
     if (dP == NULL) {
-        perror("opendir");
+        perror("failed to open directory");
         return;
     }
 
@@ -140,14 +142,12 @@ void list(const char *path) {
     closedir(dP);
 }
 
-void remove_dir(const char *path)
-{
-    if (rmdir(path) != 0){
+void remove_dir(const char *path) {
+    if (rmdir(path) != 0) {
         perror("failed to delete the directory");
-    }
-    else if {
+    } else {
         struct dirent *entry;
-        DIR *dP = opendir(path);
+        const DIR *dP = opendir(path);
 
         if (dP == NULL) {
             perror("failed to open the directory to delete the files recursively");
@@ -176,14 +176,14 @@ void remove_file(const char *path) {
 }
 
 void change_ownership(const char *path) {
-    if ((chmod(path,S_IRWXU) != 0)) {
+    if (chmod(path,S_IRWXU) != 0) {
         perror("failed to get ownership of the file");
     } else {
         printf("file permissions updated successfully");
     }
 }
 
-void copy_files(const char *arg) {
+void copy_files(const struct split_arg argument) {
     // split the argument into the source and destination
     // make a copy of the source file in the destination file
     int c;
@@ -225,7 +225,7 @@ void clear(const char *arg) {
 }
 
 void echo(const char *arg) {
-    printf("%s", arg);
+    printf("%s\n", arg);
 }
 
 void exit_(const char *arg) {
