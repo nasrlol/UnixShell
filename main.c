@@ -23,24 +23,38 @@ struct exec_command {
 
 // code prototype functions
 struct command split_command(char *input);
+
 void exec_command(char *input);
 
 // shell commands functions prototypes
 void list(const char *path);
+
 void make_dir(const char *path);
+
 void remove_file(const char *path);
+
+void remove_dir(const char *path); // trying to delete the folder and the files init recursivly
+
 void copy_files(const char *arg);
+
 void move_files(const char *arg);
+
 void print_cdirectory(const char *arg);
+
 void change_directory(const char *path);
+
 void change_ownership(const char *path);
+
 void clear(const char *arg);
+
 void echo(const char *arg);
+
 void exit_(const char *arg);
 
 struct exec_command CommandsList[] = {
     {"ls", list},
     {"mkdir", make_dir},
+    {"rmdir", remove_dir},
     {"rm", remove_file},
     {"cp", copy_files},
     {"mv", move_files},
@@ -54,10 +68,10 @@ struct exec_command CommandsList[] = {
 
 // Code functions
 struct command split_command(char *input) {
-    struct command user_command; 
+    struct command user_command;
 
-    char *command = strtok(input, " ");
-    char *argument = strtok(NULL, " ");
+    const char *command = strtok(input, " ");
+    const char *argument = strtok(NULL, " ");
 
     user_command.com = strdup(command);
 
@@ -70,7 +84,7 @@ struct command split_command(char *input) {
 }
 
 void exec_command(char *input) {
-    struct command user_command = split_command(input);
+    const struct command user_command = split_command(input);
 
     user_command.com[strcspn(user_command.com, "\n")] = '\0';
     if (user_command.arg != NULL)
@@ -106,6 +120,21 @@ void list(const char *path) {
     closedir(dP);
 }
 
+void remove_dir(const char *path)
+{
+    if (rmdir(path) != 0){
+        perror("failed to delete the directory");
+    }
+    else if {
+        struct dirent *entry;
+        DIR *dP = opendir(path);
+
+        if (dP == NULL){
+            perror("failed to open the directory to delete the files recursivly");
+        }
+    }
+}
+
 void make_dir(const char *path) {
     if (mkdir(path, 0755) == 0)
         perror("failed to make directory");
@@ -113,23 +142,22 @@ void make_dir(const char *path) {
 
 
 void remove_file(const char *path) {
-    if (unlink(path) != 0) {
+    if (remove(path) != 0) {
         perror("failed to delete file");
     }
 }
 
-void change_ownership(const char *path)
-{
-    if((chmod(path,S_IRWXU) != 0))
-    {
+void change_ownership(const char *path) {
+    if ((chmod(path,S_IRWXU) != 0)) {
         perror("failed to get ownership of the file");
     } else {
-        printf("file permissions updated succssfully");
+        printf("file permissions updated successfully");
     }
 }
 
 void copy_files(const char *arg) {
-    printf("copy file");
+    // split the argument into the source and destination
+    // make a copy of the source file in the destination file
 }
 
 void move_files(const char *arg) {
@@ -146,9 +174,10 @@ void echo(const char *arg) {
     printf("%s", arg);
 }
 
-void exit_(const char *arg){
+void exit_(const char *arg) {
     exit(0);
 }
+
 void print_cdirectory(const char *arg) {
     char *current_working_directory = getcwd(NULL, 0);
     printf("%s", current_working_directory);
@@ -157,8 +186,7 @@ void print_cdirectory(const char *arg) {
 void change_directory(const char *path) {
     if (path == NULL) {
         printf("No path found\n");
-    }
-    else if (chdir(path) != 0)
+    } else if (chdir(path) != 0)
         perror("path not found");
 }
 
