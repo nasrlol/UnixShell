@@ -88,6 +88,21 @@ struct command split_command(char *input) {
     return user_command;
 }
 
+struct split_arg split_argument(struct command argument) {
+    struct split_arg new_argument = {};
+
+    char *source = strtok(argument.arg, " ");
+    char *destination = strtok(NULL, " ");
+
+    if (source != NULL) {
+        new_argument.source = source;
+    }
+    if (destination != NULL) {
+        new_argument.destination = destination;
+    }
+    return new_argument;
+}
+
 void exec_command(char *input) {
     const struct command user_command = split_command(input);
 
