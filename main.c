@@ -21,6 +21,11 @@ struct exec_command {
     void (*func)(const char *);
 };
 
+struct split_arg {
+    const char *source;
+    const char *destination;
+};
+
 // code prototype functions
 struct command split_command(char *input);
 
