@@ -42,9 +42,9 @@ void remove_file(const char *path);
 
 void remove_dir(const char *path); // trying to delete the folder and the files init recursively
 
-void copy_files(struct split_arg);
+void copy_files(struct split_arg argument);
 
-void move_files(struct split_arg);
+void move_files(struct split_arg argument);
 
 void print_cdirectory(const char *arg);
 
@@ -115,6 +115,7 @@ void exec_command(char *input) {
     for (int i = 0; i < sizeof(CommandsList) / sizeof(CommandsList[0]); i++) {
         if (strcmp(user_command.com, CommandsList[i].cmd) == 0) {
             CommandsList[i].func(user_command.arg);
+            break;
         }
     }
     free(user_command.com);
@@ -154,7 +155,8 @@ void remove_dir(const char *path) {
         }
 
         // ReSharper disable once CppPointerConversionDropsQualifiers
-        while ((entry = readdir(dP)) != NULL) {
+        while ((entry = readdir(dP)) != NULL && (strcmp(entry->d_name, ".") != 0) && (
+                   strcmp(entry->d_name, "..") != 0)) {
             if (rmdir(entry->d_name) != 0) {
                 perror("failed to delete the directory 02");
             }
