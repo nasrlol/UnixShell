@@ -42,9 +42,11 @@ void remove_file(const char *path);
 
 void remove_dir(const char *path); // trying to delete the folder and the files init recursively
 
-void copy_files(struct split_arg argument);
+// void copy_files(struct split_arg argument);
+void copy_files(const char *arg);
 
-void move_files(struct split_arg argument);
+// void move_files(struct split_arg argument);
+void move_files(const char* arg);
 
 void print_cdirectory(const char *arg);
 
@@ -148,7 +150,8 @@ void remove_dir(const char *path) {
         perror("failed to delete the directory");
     } else {
         struct dirent *entry;
-        const DIR *dP = opendir(path);
+        // cant be a const because inserting it into the readdir functions causes a warning becasue it expects a non const dir variable
+        DIR *dP = opendir(path);
 
         if (dP == NULL) {
             perror("failed to open the directory to delete the files recursively");
@@ -185,10 +188,11 @@ void change_ownership(const char *path) {
     }
 }
 
-void copy_files(const struct split_arg argument) {
+void copy_files(const char *arg) {
     // split the argument into the source and destination
     // make a copy of the source file in the destination file
     int c;
+    struct split_arg argument = split_argument((struct command){.arg = (char *)arg});
 
     FILE *pold_file = fopen(argument.source, "r");
     if (pold_file == NULL) {
@@ -209,7 +213,10 @@ void copy_files(const struct split_arg argument) {
     fclose(pold_file);
 }
 
-void move_files(const struct split_arg argument) {
+void move_files(const char *arg) {
+
+    struct split_arg argument = split_argument((struct command){.arg = (char *)arg});
+
     if (remove(argument.source) != 0) {
         perror("failed while trying to move the file");
     }
