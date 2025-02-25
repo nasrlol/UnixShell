@@ -1,5 +1,3 @@
-Here’s a README file for your C shell project that explains the purpose, features, installation, usage, and contribution guidelines:
-
 🐚 Custom C Shell
 
 A simple Unix-like shell implemented in C with basic file system operations, directory management, and file manipulation commands.
