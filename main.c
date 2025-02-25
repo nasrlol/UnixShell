@@ -56,6 +56,8 @@ void change_directory(const char *path);
 
 void change_ownership(const char *path);
 
+void make_file(const char *path);
+
 void clear(const char *arg);
 
 void echo(const char *arg);
@@ -73,6 +75,7 @@ struct exec_command CommandsList[] = {
     {"pwd", print_cdirectory},
     {"cd", change_directory},
     {"clr", clear},
+    {"mkfile", make_file},
     {"echo", echo},
     {"exit", exit_}
 };
@@ -187,6 +190,16 @@ void make_dir(const char *path) {
 void remove_file(const char *path) {
     if (remove(path) != 0) {
         perror("failed to delete file");
+    }
+}
+
+void make_file(const char *path)
+{
+
+    FILE *new_file = fopen(path, "w");
+    if (new_file == NULL)
+    {
+        perror("failed to create the new file");
     }
 }
 
