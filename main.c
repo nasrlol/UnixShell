@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define AUTHOR "ABDELLAH EL MORABIT"
+
 #define MAX_HISTORY 100
 #define MAX_COMMAND_LENGTH 255 // not setting a  macro for the argument because they are included in the command
 #define MAX_PATH_LENGTH 1024
@@ -147,32 +149,37 @@ void list(const char *path) {
 
 void remove_dir(const char *path) {
     if (rmdir(path) != 0) {
-        perror("failed to delete the directory");
-    } else {
+        printf("directory not empty");
+    } 
+    else {
         struct dirent *entry;
         // cant be a const because inserting it into the readdir functions causes a warning becasue it expects a non const dir variable
-        DIR *dP = opendir(path);
+        DIR *dP = opendir("/");
+        printf("opended the directory");
 
         if (dP == NULL) {
             perror("failed to open the directory to delete the files recursively");
         }
 
-        // ReSharper disable once CppPointerConversionDropsQualifiers
-        while ((entry = readdir(dP)) != NULL && (strcmp(entry->d_name, ".") != 0) && (
-                   strcmp(entry->d_name, "..") != 0)) {
-            if (rmdir(entry->d_name) != 0) {
+        while ((entry = readdir(dP)) != NULL && rmdir(path) != 0){ 
+            if (strcmp(entry->d_name, "." ) == 0 || strcmp(entry->d_name, "..")== 0){
+                printf("%p",entry->d_name);
+                continue;
+            }
+            else if (remove(entry->d_name) != 0) {
+                printf("%p", entry->d_name);
                 perror("failed to delete the directory 02");
             }
         }
         printf("%p", dP);
+        closedir(dP);
     }
 }
 
 void make_dir(const char *path) {
-    if (mkdir(path, 0755) == 0)
+    if (mkdir(path, 0755) != 0)
         perror("failed to make directory");
 }
-
 
 void remove_file(const char *path) {
     if (remove(path) != 0) {
