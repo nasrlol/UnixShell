@@ -48,7 +48,7 @@ void remove_dir(const char *path); // trying to delete the folder and the files 
 void copy_files(const char *arg);
 
 // void move_files(struct split_arg argument);
-void move_files(const char* arg);
+void move_files(const char *arg);
 
 void print_cdirectory(const char *arg);
 
@@ -112,6 +112,19 @@ struct split_arg split_argument(struct command argument) {
     return new_argument;
 }
 
+int main(void) {
+    clear("");
+    // ReSharper disable once CppDFAEndlessLoop
+    while (1) {
+        printf("\n$ ");
+
+        char *input = malloc(sizeof(char) * MAX_COMMAND_LENGTH);
+        fgets(input, MAX_COMMAND_LENGTH, stdin);
+        exec_command(input);
+        free(input);
+    }
+}
+
 void exec_command(char *input) {
     const struct command user_command = split_command(input);
 
@@ -150,35 +163,41 @@ void list(const char *path) {
     closedir(dP);
 }
 
+// extra function to check if a file is a directory or another type of file, so return 0 if directory, else return 1;
+int if_directory(const char *path) {
+    struct stat info;
+
+    if (stat(path, &info) != 0) {
+        perror("failed to get info stat about the given file");
+    };
+
+    return S_ISDIR(info.st_mode) ? 1 : 0;
+}
+
 void remove_dir(const char *path) {
-    if (rmdir(path) != 0) {
-        printf("directory not empty");
-    } 
-    else {
-        struct dirent *entry;
-        // cant be a const because inserting it into the readdir functions causes a warning becasue it expects a non const dir variable
-        DIR *dP = opendir("/");
-        printf("opended the directory");
+    if (rmdir(path) == 0) {
+        printf("successfully deleted the directory");
+    } else {
+        DIR *dP = opendir(path);
+        printf("opened the directory");
 
         if (dP == NULL) {
             perror("failed to open the directory to delete the files recursively");
-
-        }
-        else {
-// bad code, should be rewritten dont look at it!!!
-            while ((entry = readdir(dP)) != NULL && rmdir(path) != 0){ 
-                if (strcmp(entry->d_name, "." ) == 0 || strcmp(entry->d_name, "..")== 0){
-                    printf("%p",entry->d_name);
+        } else {
+            struct dirent *entry;
+            while ((entry = readdir(dP)) != NULL) {
+                const char *new_path = entry->d_name;
+                if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
                     continue;
-                }
-                else if (remove(entry->d_name) != 0) {
-                    printf("%p", entry->d_name);
-                    perror("failed to delete the directory 02");
+                } else if ((if_directory(entry->d_name) == 0)) {
+                    remove_dir(new_path);
+                } else if (unlink(entry->d_name) != 0) {
+                    perror("failed to remove the file 003");
                 }
             }
+            closedir(dP);
         }
-        printf("%p", dP);
-        closedir(dP);
+        printf("successfully finished the removal of %s", path);
     }
 }
 
@@ -193,12 +212,9 @@ void remove_file(const char *path) {
     }
 }
 
-void make_file(const char *path)
-{
-
-    FILE *new_file = fopen(path, "w");
-    if (new_file == NULL)
-    {
+void make_file(const char *path) {
+    const FILE *new_file = fopen(path, "w");
+    if (new_file == NULL) {
         perror("failed to create the new file");
     }
 }
@@ -215,7 +231,7 @@ void copy_files(const char *arg) {
     // split the argument into the source and destination
     // make a copy of the source file in the destination file
     int c;
-    struct split_arg argument = split_argument((struct command){.arg = (char *)arg});
+    struct split_arg argument = split_argument((struct command){.arg = (char *) arg});
 
     FILE *pold_file = fopen(argument.source, "r");
     if (pold_file == NULL) {
@@ -237,8 +253,7 @@ void copy_files(const char *arg) {
 }
 
 void move_files(const char *arg) {
-
-    struct split_arg argument = split_argument((struct command){.arg = (char *)arg});
+    struct split_arg argument = split_argument((struct command){.arg = (char *) arg});
 
     if (remove(argument.source) != 0) {
         perror("failed while trying to move the file");
@@ -260,10 +275,6 @@ void echo(const char *arg) {
     printf("%s\n", arg);
 }
 
-void exit_(const char *arg) {
-    exit(0);
-}
-
 void print_cdirectory(const char *arg) {
     char *current_working_directory = getcwd(NULL, 0);
     printf("%s", current_working_directory);
@@ -276,15 +287,6 @@ void change_directory(const char *path) {
         perror("path not found");
 }
 
-int main(void) {
-    clear("");
-    // ReSharper disable once CppDFAEndlessLoop
-    while (1) {
-        printf("\n$ ");
-
-        char *input = malloc(sizeof(char) * MAX_COMMAND_LENGTH);
-        fgets(input, MAX_COMMAND_LENGTH, stdin);
-        exec_command(input);
-        free(input);
-    }
+void exit_(const char *arg) {
+    exit(0);
 }
