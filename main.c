@@ -159,7 +159,9 @@ void remove_dir(const char *path) {
 
         if (dP == NULL) {
             perror("failed to open the directory to delete the files recursively");
+
         }
+        else {
 
         while ((entry = readdir(dP)) != NULL && rmdir(path) != 0){ 
             if (strcmp(entry->d_name, "." ) == 0 || strcmp(entry->d_name, "..")== 0){
@@ -169,6 +171,7 @@ void remove_dir(const char *path) {
             else if (remove(entry->d_name) != 0) {
                 printf("%p", entry->d_name);
                 perror("failed to delete the directory 02");
+                }
             }
         }
         printf("%p", dP);
