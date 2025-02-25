@@ -162,15 +162,15 @@ void remove_dir(const char *path) {
 
         }
         else {
-
-        while ((entry = readdir(dP)) != NULL && rmdir(path) != 0){ 
-            if (strcmp(entry->d_name, "." ) == 0 || strcmp(entry->d_name, "..")== 0){
-                printf("%p",entry->d_name);
-                continue;
-            }
-            else if (remove(entry->d_name) != 0) {
-                printf("%p", entry->d_name);
-                perror("failed to delete the directory 02");
+// bad code, should be rewritten dont look at it!!!
+            while ((entry = readdir(dP)) != NULL && rmdir(path) != 0){ 
+                if (strcmp(entry->d_name, "." ) == 0 || strcmp(entry->d_name, "..")== 0){
+                    printf("%p",entry->d_name);
+                    continue;
+                }
+                else if (remove(entry->d_name) != 0) {
+                    printf("%p", entry->d_name);
+                    perror("failed to delete the directory 02");
                 }
             }
         }
