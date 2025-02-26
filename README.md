@@ -28,12 +28,12 @@ This project is a custom shell written in C, designed to mimic basic Unix shell 
 	•	🎨 Screen Clearing: Clear the terminal screen with the clr command.
 	•	🚪 Graceful Exit: Exit the shell cleanly.
 
+
 ⚡ Installation
 	1.	Clone the repository:
 
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-
+git clone https://github.com/nasrlol/unixshell
+cd unixshell 
 
 	2.	Compile the shell:
 
