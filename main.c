@@ -171,35 +171,44 @@ int if_directory(const char *path) {
         perror("failed to get info stat about the given file");
     };
 
-    return S_ISDIR(info.st_mode) ? 1 : 0;
+    return S_ISDIR(info.st_mode) ? 0 : 1;
 }
 
 void remove_dir(const char *path) {
-    if (rmdir(path) == 0) {
-        printf("successfully deleted the directory");
-    } else {
-        DIR *dP = opendir(path);
-        printf("opened the directory");
+    DIR *dP = opendir(path);
 
-        if (dP == NULL) {
-            perror("failed to open the directory to delete the files recursively");
-        } else {
-            struct dirent *entry;
-            while ((entry = readdir(dP)) != NULL) {
-                const char *new_path = entry->d_name;
-                if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-                    continue;
-                } else if ((if_directory(entry->d_name) == 0)) {
-                    remove_dir(new_path);
-                } else if (unlink(entry->d_name) != 0) {
-                    perror("failed to remove the file 003");
-                }
-            }
-            closedir(dP);
+    if (dP == NULL) {
+        perror("failed to open the directory to delete the files recursively");
+        return;
+    } else 
+    {
+        printf("opened the directory");
+    }
+    struct dirent *entry;
+
+    while ((entry = readdir(dP)) != NULL) {
+        printf("%s\n", entry->d_name);
+
+        char full_path[MAX_PATH_LENGTH];
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
         }
-        printf("successfully finished the removal of %s", path);
+        snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+        if (if_directory(full_path) == 0) {
+            remove_dir(full_path);
+        } else if (remove(full_path) != 0) {
+            perror("failed to remove the file 003");
+        }
+    }
+    closedir(dP);
+
+    if (rmdir(path) != 0) {
+        perror("failed to remove the directory");
+    } else {
+        printf("successfully removed the directory");
     }
 }
+
 
 void make_dir(const char *path) {
     if (mkdir(path, 0755) != 0)
